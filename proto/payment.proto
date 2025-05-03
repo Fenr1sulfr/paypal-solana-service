@@ -1,0 +1,161 @@
+syntax = "proto3";
+
+package payment;
+
+option go_package = "../internal/ports/grpc/pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service PaymentService {
+  // Create a new payment with PayPal
+  rpc CreatePayment(CreatePaymentRequest) returns (PaymentResponse);
+  
+  // Execute a previously created payment after user approval
+  rpc ExecutePayment(ExecutePaymentRequest) returns (PaymentResponse);
+  
+  // Get details of a specific payment
+  rpc GetPayment(GetPaymentRequest) returns (PaymentResponse);
+  
+  // List payments with optional filters
+  rpc ListPayments(ListPaymentsRequest) returns (ListPaymentsResponse);
+  
+  // Cancel a pending payment
+  rpc CancelPayment(CancelPaymentRequest) returns (PaymentResponse);
+  
+  // Store payment information in Solana (can be called separately or automatically)
+  rpc StoreInSolana(StoreInSolanaRequest) returns (StoreInSolanaResponse);
+  
+  // Verify a Solana transaction
+  rpc VerifySolanaTransaction(VerifySolanaRequest) returns (VerifySolanaResponse);
+  
+  // Webhook handler for PayPal notifications
+  rpc HandlePayPalWebhook(PayPalWebhookRequest) returns (google.protobuf.Empty);
+}
+
+// Request to create a new payment
+message CreatePaymentRequest {
+  double amount = 1;
+  string currency = 2;
+  string description = 3;
+  string return_url = 4;
+  string cancel_url = 5;
+  map<string, string> metadata = 6;
+  bool auto_store_in_solana = 7;
+}
+
+// Request to execute a payment after approval
+message ExecutePaymentRequest {
+  string payment_id = 1;
+  string payer_id = 2;
+}
+
+// Request to get a payment by ID
+message GetPaymentRequest {
+  string id = 1;
+  bool include_solana_details = 2;
+}
+
+// Request to list payments with filters
+message ListPaymentsRequest {
+  string status = 1;
+  google.protobuf.Timestamp start_date = 2;
+  google.protobuf.Timestamp end_date = 3;
+  int32 page = 4;
+  int32 page_size = 5;
+}
+
+// Response containing a list of payments
+message ListPaymentsResponse {
+  repeated PaymentResponse payments = 1;
+  int32 total_count = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+// Request to cancel a payment
+message CancelPaymentRequest {
+  string payment_id = 1;
+  string reason = 2;
+}
+
+// Request to store payment in Solana
+message StoreInSolanaRequest {
+  string payment_id = 1;
+  string solana_address = 2;
+}
+
+// Response after storing in Solana
+message StoreInSolanaResponse {
+  string payment_id = 1;
+  string solana_signature = 2;
+  string solana_address = 3;
+  bool success = 4;
+  string transaction_url = 5;
+}
+
+// Request to verify a Solana transaction
+message VerifySolanaRequest {
+  string solana_signature = 1;
+}
+
+// Response for Solana verification
+message VerifySolanaResponse {
+  bool verified = 1;
+  string payment_id = 2;
+  google.protobuf.Timestamp transaction_time = 3;
+}
+
+// PayPal webhook notification
+message PayPalWebhookRequest {
+  string event_type = 1;
+  string resource_type = 2;
+  string payment_id = 3;
+  bytes raw_payload = 4;
+}
+
+// Main payment response object
+message PaymentResponse {
+  string id = 1;
+  string payment_id = 2;
+  double amount = 3;
+  string currency = 4;
+  string status = 5;
+  string description = 6;
+  
+  // PayPal specific fields
+  string paypal_url = 7;
+  string payer_email = 8;
+  string payer_id = 9;
+  string merchant_id = 10;
+  
+  // Solana fields
+  string solana_signature = 11;
+  string solana_address = 12;
+  bool stored_in_solana = 13;
+  string solana_transaction_url = 14;
+  
+  // Timestamps
+  google.protobuf.Timestamp created_at = 15;
+  google.protobuf.Timestamp updated_at = 16;
+  google.protobuf.Timestamp completed_at = 17;
+  
+  // Additional data
+  map<string, string> metadata = 18;
+  
+  // Error information if applicable
+  string error_code = 19;
+  string error_message = 20;
+}
+
+// Payment status enum
+enum PaymentStatus {
+  PAYMENT_STATUS_UNKNOWN = 0;
+  PAYMENT_STATUS_CREATED = 1;
+  PAYMENT_STATUS_APPROVED = 2;
+  PAYMENT_STATUS_EXECUTED = 3;
+  PAYMENT_STATUS_COMPLETED = 4;
+  PAYMENT_STATUS_FAILED = 5;
+  PAYMENT_STATUS_CANCELLED = 6;
+  PAYMENT_STATUS_REFUNDED = 7;
+}
