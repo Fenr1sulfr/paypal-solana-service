@@ -9,21 +9,21 @@ import (
 )
 
 type Service struct {
-	repo payment.Repository
-	// solanaClient payment.SolanaClient
+	repo         payment.Repository
+	solanaClient payment.SolanaClient
 	paypalClient payment.PayPalClient
 	baseURL      string
 }
 
 func NewService(
 	repo payment.Repository,
-	// solanaClient payment.SolanaClient,
+	solanaClient payment.SolanaClient,
 	paypalClient payment.PayPalClient,
 	baseURL string,
 ) *Service {
 	return &Service{
-		repo: repo,
-		// solanaClient: solanaClient,
+		repo:         repo,
+		solanaClient: solanaClient,
 		paypalClient: paypalClient,
 		baseURL:      baseURL,
 	}
@@ -167,9 +167,12 @@ func (s *Service) StoreInSolana(ctx context.Context, id string, solanaAddress st
 		return nil, errors.New("can only store completed payments in Solana")
 	}
 
+	if p.SolanaAddress == "" {
+		p.SolanaAddress = solanaAddress
+	}
+	tx, err := s.solanaClient.StorePayment(ctx, p)
 	// Set Solana address
-	p.SolanaAddress = solanaAddress
-
+	p.Metadata["encodedTX"] = tx
 	// Store in Solana
 	// signature, err := s.solanaClient.StorePayment(ctx, p)
 	if err != nil {

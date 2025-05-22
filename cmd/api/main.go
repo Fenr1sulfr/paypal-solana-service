@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"payment.Diploma.service/internal/config"
+	solana_payment "payment.Diploma.service/internal/infrastructure/blockchain"
 	"payment.Diploma.service/internal/infrastructure/database"
 	"payment.Diploma.service/internal/infrastructure/paypal"
 
@@ -55,6 +56,7 @@ func main() {
 	// if err != nil {
 	// 	log.Fatalf("Failed to initialize Solana client: %v", err)
 	// }
+	solanaClient := solana_payment.NewSolanaClient(cfg.Solana.Endpoint, cfg.Solana.ProgramID)
 
 	// Initialize PayPal client
 	paypalClient := paypal.NewPayPalClient(
@@ -66,6 +68,7 @@ func main() {
 	// Initialize payment service
 	service := paymentService.NewService(
 		paymentRepo,
+		solanaClient,
 		paypalClient,
 		cfg.Server.BaseURL,
 	)

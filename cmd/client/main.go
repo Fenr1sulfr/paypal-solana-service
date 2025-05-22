@@ -25,7 +25,6 @@ func main() {
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-
 	// Create a payment
 	createResp, err := client.CreatePayment(ctx, &pb.CreatePaymentRequest{
 		Amount:      99.99,

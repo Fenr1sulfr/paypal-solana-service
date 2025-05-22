@@ -20,7 +20,7 @@ type Payment struct {
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 	CompletedAt     time.Time
-	Metadata        map[string]string
+	Metadata        map[string]string	
 }
 
 // Repository interface for database operations
