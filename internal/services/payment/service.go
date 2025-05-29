@@ -163,9 +163,9 @@ func (s *Service) StoreInSolana(ctx context.Context, id string, solanaAddress st
 		return nil, err
 	}
 
-	if p.Status != "completed" {
-		return nil, errors.New("can only store completed payments in Solana")
-	}
+	// if p.Status != "completed" {
+	// 	return nil, errors.New("can only store completed payments in Solana")
+	// }
 
 	if p.SolanaAddress == "" {
 		p.SolanaAddress = solanaAddress

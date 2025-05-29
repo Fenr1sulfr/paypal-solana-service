@@ -16,6 +16,20 @@ type SolanaPaymentSystem struct {
 	Client    *rpc.Client
 	programID solana.PublicKey
 }
+type PaymentStatus struct {
+	Success   bool      `json:"success"`
+	Signature string    `json:"signature,omitempty"`
+	Amount    float64   `json:"amount,omitempty"`
+	Timestamp time.Time `json:"timestamp,omitempty"`
+	Confirmed bool      `json:"confirmed"`
+	Error     string    `json:"error,omitempty"`	
+}
+
+type PaymentResult struct {
+	Success   bool
+	Signature string
+	Error     error
+}
 
 var (
 	programID   = "YRoyDgtmHvKDpFdksFPdcCB16ymBspq2kUhgVz18JFQ"
@@ -39,6 +53,111 @@ func New() *SolanaPaymentSystem {
 		programID: programID,
 	}
 
+}
+
+func containsReference(accountKeys []solana.PublicKey, referenceKey string) bool {
+	refPubKey, err := solana.PublicKeyFromBase58(referenceKey)
+	if err != nil {
+		return false
+	}
+
+	for _, key := range accountKeys {
+		if key.Equals(refPubKey) {
+			return true
+		}
+	}
+	return false
+}
+
+func isValidPayment(tx *rpc.GetTransactionResult, expectedAmount float64, recipient, referenceKey string) bool {
+	if tx == nil || tx.Meta == nil || tx.Meta.Err != nil {
+		return false
+	}
+
+	// Проверяем инструкции
+	for _, instruction := range tx.Transaction.GetParsedTransaction().Message.Instructions {
+		// Проверяем transfer инструкции
+		if isTransferInstruction(instruction, expectedAmount, recipient) {
+			// Проверяем наличие reference в аккаунтах
+			if containsReference(tx.Transaction.GetParsedTransaction().Message.AccountKeys, referenceKey) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func isTransferInstruction(instruction rpc.ParsedInstruction, expectedAmount float64, recipient string) bool {
+	// Проверяем программу (System Program для SOL или Token Program для SPL)
+	// и параметры перевода
+	// Это зависит от конкретной реализации
+	return true // упрощенная проверка
+}
+
+func (s *SolanaPaymentSystem) GenerateSolanaLink(authority solana.PublicKey, amount float64, label, message string) (string, string, error) {
+	// Generate a unique reference (for example, using current timestamp)
+	referenceKey := solana.NewWallet().PublicKey()
+	recipient := authority.String()
+	memo := "DiplomaPayment"
+
+	link := fmt.Sprintf(
+		"solana:%s?amount=%.9f&reference=%s&label=%s&message=%s&memo=%s",
+		recipient,
+		amount,
+		referenceKey.String(),
+		label,
+		message,
+		memo,
+	)
+	return link, referenceKey.String(), nil
+}
+
+func (s *SolanaPaymentSystem) VerifyPayment(referenceKey string, expectedAmount float64, recipient string) (*PaymentStatus, error) {
+	// Преобразуем reference ключ
+	refPubKey, err := solana.PublicKeyFromBase58(referenceKey)
+	if err != nil {
+		return nil, fmt.Errorf("invalid reference key: %v", err)
+	}
+	limit := 10 // Получаем подписи транзакций для reference аккаунта
+	signatures, err := s.Client.GetSignaturesForAddressWithOpts(
+		context.Background(),
+		refPubKey,
+		&rpc.GetSignaturesForAddressOpts{
+			Limit: &limit, // последние 10 транзакций
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get signatures: %v", err)
+	}
+
+	for _, sig := range signatures {
+		// Получаем детали транзакции
+		tx, err := s.Client.GetTransaction(
+			context.Background(),
+			sig.Signature,
+			&rpc.GetTransactionOpts{
+				Encoding:   solana.EncodingJSON,
+				Commitment: rpc.CommitmentConfirmed,
+			},
+		)
+		if err != nil {
+			continue
+		}
+
+		// Проверяем транзакцию
+		if isValidPayment(tx, expectedAmount, recipient, referenceKey) {
+			return &PaymentStatus{
+				Success:   true,
+				Signature: sig.Signature.String(),
+				Amount:    expectedAmount,
+				Timestamp: time.Unix(int64(*sig.BlockTime), 0),
+				Confirmed: true,
+			}, nil
+		}
+	}
+
+	return &PaymentStatus{Success: false}, nil
 }
 
 func (s *SolanaPaymentSystem) InitStorage(authority solana.PublicKey, system solana.PublicKey) string {
