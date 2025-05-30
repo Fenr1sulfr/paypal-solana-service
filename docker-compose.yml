@@ -18,11 +18,22 @@ services:
       - SOLANA_ENDPOINT=https://api.devnet.solana.com
       - SOLANA_PRIVATE_KEY=${SOLANA_PRIVATE_KEY}
       - SOLANA_PROGRAM_ID=${SOLANA_PROGRAM_ID}
-      - TS_SERVER_URL=http://host.docker.internal:8081
+      - TS_SERVER_URL=http://ts-api:8081
       - TS_CLIENT_PRIVATE_KEY=${SOLANA_PROGRAM_ID}
       - TS_CLIENT_TIMEOUT_SEC=10
     depends_on:
       - mongo
+      - ts-api
+    restart: unless-stopped
+
+  ts-api:
+    build:
+      context: ./ts-api
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - NODE_ENV=production
     restart: unless-stopped
 
   mongo:
