@@ -18,6 +18,9 @@ services:
       - SOLANA_ENDPOINT=https://api.devnet.solana.com
       - SOLANA_PRIVATE_KEY=${SOLANA_PRIVATE_KEY}
       - SOLANA_PROGRAM_ID=${SOLANA_PROGRAM_ID}
+      - TS_SERVER_URL=http://host.docker.internal:8081
+      - TS_CLIENT_PRIVATE_KEY=${SOLANA_PROGRAM_ID}
+      - TS_CLIENT_TIMEOUT_SEC=10
     depends_on:
       - mongo
     restart: unless-stopped

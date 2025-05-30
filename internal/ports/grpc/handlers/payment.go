@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"google.golang.org/grpc/codes"
@@ -115,6 +116,8 @@ func (h *PaymentHandler) CancelPayment(ctx context.Context, req *pb.CancelPaymen
 }
 
 func (h *PaymentHandler) StoreInSolana(ctx context.Context, req *pb.StoreInSolanaRequest) (*pb.StoreInSolanaResponse, error) {
+	log.Printf("StoreInSolana called: payment_id=%s, solana_address=%s", req.PaymentId, req.SolanaAddress)
+
 	p, err := h.service.StoreInSolana(ctx, req.PaymentId, req.SolanaAddress)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to store payment in Solana: %v", err)
@@ -123,7 +126,7 @@ func (h *PaymentHandler) StoreInSolana(ctx context.Context, req *pb.StoreInSolan
 	// Explorer URL
 	explorerURL := "https://explorer.solana.com/tx/" + p.SolanaSignature
 	if p.SolanaSignature == "" || !isValidSignature(p.SolanaSignature) {
-		explorerURL = ""
+		explorerURL = ""	
 	}
 
 	return &pb.StoreInSolanaResponse{
@@ -132,6 +135,21 @@ func (h *PaymentHandler) StoreInSolana(ctx context.Context, req *pb.StoreInSolan
 		SolanaAddress:   p.SolanaAddress,
 		Success:         p.SolanaSignature != "",
 		TransactionUrl:  explorerURL,
+	}, nil
+}
+
+func (h *PaymentHandler) InitSolanaStorage(ctx context.Context, req *pb.InitSolanaStorageRequest) (*pb.InitSolanaStorageResponse, error) {
+	// Initialize Solana storage
+	// In a real implementation, this would set up the necessary accounts or state on Solana
+	// Here we just return a success response
+	p, err := h.service.InitSolanaStorage(ctx, req.SolanaAddress, "")
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to store payment in Solana: %v", err)
+	}
+	return &pb.InitSolanaStorageResponse{
+		Success:       true,
+		SolanaAddress: p,
+		Message:       "Solana storage initialized successfully",
 	}, nil
 }
 

@@ -158,7 +158,7 @@ func (s *Service) CancelPayment(ctx context.Context, id, reason string) (*paymen
 }
 
 func (s *Service) StoreInSolana(ctx context.Context, id string, solanaAddress string) (*payment.Payment, error) {
-	p, err := s.repo.FindByID(ctx, id)
+	p, err := s.repo.FindByPaymentID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -188,6 +188,13 @@ func (s *Service) StoreInSolana(ctx context.Context, id string, solanaAddress st
 	}
 
 	return p, nil
+}
+func (s *Service) InitSolanaStorage(ctx context.Context, publicKey, description string) (string, error) {
+	// Initialize Solana storage
+	// return s.solanaClient.InitSolanaStorage(ctx, publicKey, description)
+	return s.solanaClient.InitSolanaStorage(ctx, publicKey, description)
+
+	// return "", errors.New("not implemented")
 }
 
 func (s *Service) VerifySolanaTransaction(ctx context.Context, signature string) (bool, *payment.Payment, time.Time, error) {

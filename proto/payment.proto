@@ -26,11 +26,22 @@ service PaymentService {
   // Store payment information in Solana (can be called separately or automatically)
   rpc StoreInSolana(StoreInSolanaRequest) returns (StoreInSolanaResponse);
   
+  rpc InitSolanaStorage (InitSolanaStorageRequest) returns (InitSolanaStorageResponse);
   // Verify a Solana transaction
   rpc VerifySolanaTransaction(VerifySolanaRequest) returns (VerifySolanaResponse);
   
   // Webhook handler for PayPal notifications
   rpc HandlePayPalWebhook(PayPalWebhookRequest) returns (google.protobuf.Empty);
+}
+
+// Request to initialize Solana storage
+message InitSolanaStorageRequest {
+  string solana_address = 1;
+}
+message InitSolanaStorageResponse {
+  string solana_address = 1;
+  bool success = 2;
+  string message = 3; // Additional info if needed
 }
 
 // Request to create a new payment

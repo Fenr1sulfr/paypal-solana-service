@@ -56,7 +56,7 @@ func main() {
 	// if err != nil {
 	// 	log.Fatalf("Failed to initialize Solana client: %v", err)
 	// }
-	solanaClient := solana_payment.NewSolanaClient(cfg.Solana.Endpoint, cfg.Solana.ProgramID)
+	solanaClient := solana_payment.New(*cfg)
 
 	// Initialize PayPal client
 	paypalClient := paypal.NewPayPalClient(

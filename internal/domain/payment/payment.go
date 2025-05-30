@@ -36,6 +36,7 @@ type Repository interface {
 type SolanaClient interface {
 	StorePayment(ctx context.Context, payment *Payment) (string, error)
 	VerifyTransaction(ctx context.Context, signature string) (bool, time.Time, error)
+	InitSolanaStorage(ctx context.Context, publicKey, description string) (string, error)
 }
 
 // PayPalClient interface for payment gateway operations

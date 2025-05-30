@@ -7,10 +7,17 @@ import (
 )
 
 type Config struct {
-	Server  ServerConfig
-	MongoDB MongoDBConfig
-	PayPal  PayPalConfig
-	Solana  SolanaConfig
+	Server   ServerConfig
+	MongoDB  MongoDBConfig
+	PayPal   PayPalConfig
+	Solana   SolanaConfig
+	TSClient TSClientConfig
+}
+
+type TSClientConfig struct {
+	URL        string
+	PrivateKey string
+	TimeoutSec int
 }
 
 type ServerConfig struct {
@@ -55,6 +62,12 @@ func Load() *Config {
 			PrivateKey: getEnv("SOLANA_PRIVATE_KEY", ""),
 			ProgramID:  getEnv("SOLANA_PROGRAM_ID", ""),
 		},
+		TSClient: TSClientConfig{
+		URL:        getEnv("TS_SERVER_URL", ""),
+		PrivateKey: getEnv("TS_CLIENT_PRIVATE_KEY", ""),
+		TimeoutSec: getEnvAsInt("TS_CLIENT_TIMEOUT_SEC", 10),
+},
+
 	}
 }
 
