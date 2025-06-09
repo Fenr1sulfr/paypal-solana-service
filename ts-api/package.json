@@ -11,13 +11,18 @@
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.31.1",
+    "@metaplex-foundation/mpl-token-metadata": "^3.4.0",
+    "@metaplex-foundation/umi-bundle-defaults": "^1.2.0",
     "@project-serum/anchor": "^0.26.0",
+    "@solana-developers/helpers": "^2.8.1",
+    "@solana/pay": "^0.2.5",
     "@solana/web3.js": "^1.87.6",
     "bignumber.js": "^9.1.2",
     "bs58": "^5.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "mongodb": "^6.17.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
