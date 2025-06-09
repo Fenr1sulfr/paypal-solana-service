@@ -3,15 +3,12 @@ import BigNumber from 'bignumber.js';
 import { PublicKey, Keypair, Connection } from '@solana/web3.js';
 import { encodeURL, findReference, validateTransfer } from '@solana/pay';
 import { MongoClient } from 'mongodb';
-// --- CONFIGURABLE PARAMETERS ---
-const myWallet = process.env.SOLANA_PAY_WALLET || '2mfgb89uNAjiccofKXHHfc3GoTrV9rpT5hqmiGYE4ptR';
+const myWallet = 'DemoKMZWkk483hX4mUrcJoo3zVvsKhm8XXs28TuwZw9H'; // Replace with your wallet address (this is the destination where the payment will be sent)
 const recipient = new PublicKey(myWallet);
-
-const amount = new BigNumber(process.env.SOLANA_PAY_AMOUNT || 0.0001);
-const label = process.env.SOLANA_PAY_LABEL || 'Agrichain payment request';
-const memo = process.env.SOLANA_PAY_MEMO || 'Agrichain Solana Pay Demo Public Memo';
-const quicknodeEndpoint = process.env.SOLANA_RPC_ENDPOINT || 'https://api.devnet.solana.com';
-
+const amount = new BigNumber(0.0001); // 0.0001 SOL
+const label = 'QuickNode Guide Store';
+const memo = 'QN Solana Pay Demo Public Memo';
+const quicknodeEndpoint = 'https://api.devnet.solana.com'
 const paymentRequests = new Map<string, { recipient: PublicKey; amount: BigNumber; memo: string }>();
 
 async function generateUrl(
@@ -74,7 +71,7 @@ async function verifyTransaction(reference: PublicKey) {
   return response;
 }
 
-const mongoUri = process.env.MONGODB_URI || 'mongodb://mongo:27017';
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
 const mongoDbName = process.env.MONGODB_DATABASE || 'payment_api';
 let mongoClient: MongoClient | null = null;
 
@@ -132,7 +129,7 @@ export async function SolanaVerifyHandler(req: Request, res: Response) {
                         recipient: recipient.toBase58(),
                         amount: amount.toString(),
                         memo,
-                        signature: response.transaction.signatures,
+                        signature: response,
                         verifiedAt: new Date(),
                     });
                 } catch (mongoError) {

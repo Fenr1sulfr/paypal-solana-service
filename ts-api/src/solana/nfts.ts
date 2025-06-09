@@ -66,9 +66,9 @@ async function main() {
     console.log("Creating NFT collection...");
     const transaction = await createNft(umi, {
       mint: collectionMint,
-      name: "My Collection",
-      symbol: "MC",
-      uri: "https://raw.githubusercontent.com/solana-developers/professional-education/main/labs/sample-nft-collection-offchain-data.json",
+      name: "Agrichain",
+      symbol: "AGCH",
+      uri: "https://raw.githubusercontent.com/Fenr1sulfr/paypal-solana-service/main/metadata.json",
       sellerFeeBasisPoints: percentAmount(0),
       isCollection: true,
     });
