@@ -1,29 +1,29 @@
 {
-    "name": "Name",
-    "symbol": "symbol",
-    "description": "your description",
-    "image": "quicknode.myfilebase.com/ipfs/CID",
+    "name": "AgrichainCollection",
+    "symbol": "AGRIC",
+    "description": "NFT Collection for Agrichain project",
+    "image": "https://raw.githubusercontent.com/Fenr1sulfr/paypal-solana-service/main/agrichain.png",
     "attributes": [
         {
-            "trait_type": "type",
-            "value": "value"
+            "class": "Owners",
+            "effect": "no effect"
         }
     ],
     "properties": {
         "creators": [
             {
-                "address": "creators's wallet address",
+                "address": "ATyUm1txZfZCxnomxXQDWMhfXVGSwpQfuB5oup2qYrG7",
                 "share": royalty
             }
         ],
         "files": [
             {
                 "type": "image/png",
-                "uri": "ipfs://CID"
+                "uri": "https://raw.githubusercontent.com/Fenr1sulfr/paypal-solana-service/main/agrichain.png"
             }
         ]
     },
     "collection": {
-        "name": "name",
+        "name": "Agrichain",
         "family": "family"
     }
