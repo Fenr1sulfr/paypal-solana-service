@@ -1,0 +1,29 @@
+{
+    "name": "Name",
+    "symbol": "symbol",
+    "description": "your description",
+    "image": "quicknode.myfilebase.com/ipfs/CID",
+    "attributes": [
+        {
+            "trait_type": "type",
+            "value": "value"
+        }
+    ],
+    "properties": {
+        "creators": [
+            {
+                "address": "creators's wallet address",
+                "share": royalty
+            }
+        ],
+        "files": [
+            {
+                "type": "image/png",
+                "uri": "ipfs://CID"
+            }
+        ]
+    },
+    "collection": {
+        "name": "name",
+        "family": "family"
+    }
