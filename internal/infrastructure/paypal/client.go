@@ -69,8 +69,8 @@ func (c *PayPalClient) CreatePayment(ctx context.Context, amount float64, curren
 			StandardEntryClassCode: paypal.StandardEntryClassCodeTel,
 		},
 		LandingPage: "NO_PREFERENCE",
-		ReturnURL:   returnURL, // Use parameter instead of hardcoded value
-		CancelURL:   cancelURL, // Use parameter instead of hardcoded value
+		ReturnURL:   "localhost:3000/payment-success", // Use parameter instead of hardcoded value
+		CancelURL:   "localhost:3000",                 // Use parameter instead of hardcoded value
 	}
 
 	order, err := c.client.CreateOrder(ctx, paypal.OrderIntentCapture, []paypal.PurchaseUnitRequest{unit}, nil, &appContext)
